@@ -1,0 +1,50 @@
+# .gitignore
+
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+
+# Build and Distribution
+dist/
+build/
+
+# Runtime Data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# OS Specific Files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Coverage Reports
+coverage/
+.nyc_output/
+
+# Temporary Files
+tmp/
+temp/
+
+# MacOS files
+.DS_Store
+
+# Logs
+logs/
+*.log
+
