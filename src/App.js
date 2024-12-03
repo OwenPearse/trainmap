@@ -1,57 +1,40 @@
-/* src/App.js */
 import React, { useState } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import MapComponent from './components/MapComponent';
+import Menu from './components/HamburgerMenu';
+import transitRoutes from './data/routes/melbTransitRoutes.json'; // Import sample transit routes data
 import './App.css';
-import 'leaflet/dist/leaflet.css';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [transportTypes, setTransportTypes] = useState({
+    Train: true,
+    Tram: true,
+    Bus: true
+  });
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  // Define the bounds for Melbourne
-  const worldBounds = [
-    [-90, -180], // Southwest corner (South Pole)
-    [90, 180],    // Northeast corner (North Pole)
-  ];
+  const toggleTransportType = (type) => {
+    setTransportTypes(prevState => ({
+      ...prevState,
+      [type]: !prevState[type]
+    }));
+  };
+
+  // Extract selected transport types
+  const selectedTypes = Object.keys(transportTypes).filter(type => transportTypes[type]);
 
   return (
     <div className="App">
-      {/* Hamburger Menu */}
-      <div className="hamburger-menu">
-        <button className="hamburger-button" onClick={toggleMenu}>
-          &#9776;
-        </button>
-        {menuOpen && (
-          <div className="menu-content">
-            <a href="#home">Home</a>
-            <a href="#trains">Trains</a>
-            <a href="#trams">Trams</a>
-            <a href="#buses">Buses</a>
-            <a href="#settings">Settings</a>
-          </div>
-        )}
-      </div>
-
-
-      <MapContainer
-        center={[20, 0]}
-        zoom={2}
-        scrollWheelZoom={true}
-        className="map-container"
-        minZoom={2}
-        maxZoom={18}
-        maxBounds={worldBounds}
-        maxBoundsViscosity={1.0}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {/* Transit Lines and Other Layers */}
-      </MapContainer>
+      <Menu
+        menuOpen={menuOpen}
+        toggleMenu={toggleMenu}
+        transportTypes={transportTypes}
+        toggleTransportType={toggleTransportType}
+      />
+      <MapComponent routesData={transitRoutes} selectedTypes={selectedTypes} />
     </div>
   );
 }
