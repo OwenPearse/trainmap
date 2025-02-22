@@ -1,11 +1,10 @@
 // backend/app.js
 const express = require('express');
 const cors = require('cors');
-const routeRoutes = require('./routes/routeRoutes');
-const stopRoutes = require('./routes/stopRoutes');
 const errorHandler = require('./utils/errorHandler');
 const connectDB = require('./config/db');
 const redisClient = require('./config/redis');
+const routeController = require('./controllers/routeController');
 
 const app = express();
 
@@ -17,8 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/routes', routeRoutes);
-app.use('/api/stops', stopRoutes);
+app.use('/api/routes', routeController);
 
 // Error Handling Middleware
 app.use(errorHandler);

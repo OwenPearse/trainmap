@@ -1,30 +1,22 @@
 // backend/controllers/routeController.js
-const TransitRoute = require('../models/TransitRoute');
+const express = require('express');
+const router = express.Router();
+const { getRoutesByType } = require('../services/dataFetcher');
 
-// Fetch all routes with optional filtering
-const getAllRoutes = async (req, res) => {
-  const { types, regions } = req.query;
+/**
+ * GET /api/routes/:type
+ * e.g. /api/routes/0 => get train routes
+ *      /api/routes/1 => get tram routes
+ */
+router.get('/:type', async (req, res) => {
   try {
-    let query = {};
-    if (types) {
-      const typeArray = types.split(',').map(type => type.trim());
-      query.route_type = { $in: typeArray };
-    }
-    if (regions) {
-      const regionArray = regions.split(',').map(region => region.trim());
-      query.region = { $in: regionArray };
-    }
-    const routes = await TransitRoute.find(query);
-    res.json({ routes });
+    const routeType = parseInt(req.params.type, 10);
+    const data = await getRoutesByType(routeType);
+    res.json(data);
   } catch (error) {
-    console.error('Error fetching routes:', error.message);
-    res.status(500).json({ error: 'Failed to fetch routes.' });
+    console.error('Error in routeController:', error);
+    res.status(500).json({ error: error.message });
   }
-};
+});
 
-// Add more controller functions as needed (e.g., createRoute, updateRoute, deleteRoute)
-
-module.exports = {
-  getAllRoutes,
-  // export other functions
-};
+module.exports = router;
