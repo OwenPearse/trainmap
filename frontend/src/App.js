@@ -1,41 +1,24 @@
-import React, { useState } from 'react';
+// frontend/src/App.js
+import React from 'react';
 import MapComponent from './components/MapComponent';
-import Menu from './components/HamburgerMenu';
-import transitRoutes from './data/routes/melbTransitRoutes.json'; // Import sample transit routes data
-import './App.css';
+import useRoutesData from './hooks/useRoutesData';
+import useStopsData from './hooks/useStopsData';
 
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [transportTypes, setTransportTypes] = useState({
-    Train: true,
-    Tram: true,
-    Bus: true
-  });
+  const { routesData, loading: routesLoading, error: routesError } = useRoutesData();
+  const { stopsData, loading: stopsLoading, error: stopsError } = useStopsData();
+  const selectedTypes = [0, 1, 2]; // adjust as needed
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const toggleTransportType = (type) => {
-    setTransportTypes(prevState => ({
-      ...prevState,
-      [type]: !prevState[type]
-    }));
-  };
-
-  // Extract selected transport types
-  const selectedTypes = Object.keys(transportTypes).filter(type => transportTypes[type]);
+  if (routesLoading || stopsLoading) return <div>Loading...</div>;
+  if (routesError) return <div>Error loading routes: {routesError.message}</div>;
+  if (stopsError) return <div>Error loading stops: {stopsError.message}</div>;
 
   return (
-    <div className="App">
-      <Menu
-        menuOpen={menuOpen}
-        toggleMenu={toggleMenu}
-        transportTypes={transportTypes}
-        toggleTransportType={toggleTransportType}
-      />
-      <MapComponent routesData={transitRoutes} selectedTypes={selectedTypes} />
-    </div>
+    <MapComponent 
+      routesData={routesData} 
+      stopsData={stopsData} 
+      selectedTypes={selectedTypes} 
+    />
   );
 }
 

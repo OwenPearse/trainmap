@@ -1,26 +1,44 @@
-// backend/controllers/stopController.js
-const Stop = require('../models/Stop');
+// backend/controllers/StopsController.js
+const express = require('express');
+const router = express.Router();
+const { fetchFromPTV } = require('../services/ptvService');
+const { getAllRoutes } = require('../services/aggregateRoutes');
 
-// Fetch all stops with optional filtering
-const getAllStops = async (req, res) => {
-  const { regions } = req.query;
+/**
+ * GET /api/allstops
+ * Aggregates stops for all routes using the v3 endpoint:
+ *   /v3/stops/route/{route_id}/route_type/{route_type}
+ */
+router.get('/', async (req, res) => {
   try {
-    let query = {};
-    if (regions) {
-      const regionArray = regions.split(',').map(region => region.trim());
-      query.region = { $in: regionArray };
-    }
-    const stops = await Stop.find(query);
-    res.json({ stops });
+    // Retrieve all routes across the desired transport types.
+    const allRoutes = await getAllRoutes();
+    
+    // For each route, fetch its stops using the v3 endpoint.
+    const stopsPromises = allRoutes.map(async (route) => {
+      const routeId = route.route_id;
+      const routeType = route.route_type;
+      const endpoint = `/v3/stops/route/${routeId}/route_type/${routeType}`;
+      try {
+        const data = await fetchFromPTV(endpoint);
+        // Assume the response includes a "stops" property.
+        return data.stops || [];
+      } catch (error) {
+        console.error(`Error fetching stops for route ${routeId}:`, error.message);
+        // If the endpoint returns 404 or fails, return an empty array for that route.
+        return [];
+      }
+    });
+    
+    // Wait for all stops calls to complete and flatten the array.
+    const stopsArrays = await Promise.all(stopsPromises);
+    const allStops = stopsArrays.flat();
+    
+    res.json({ stops: allStops });
   } catch (error) {
-    console.error('Error fetching stops:', error.message);
-    res.status(500).json({ error: 'Failed to fetch stops.' });
+    console.error('Error in allStopsController:', error);
+    res.status(500).json({ error: error.message });
   }
-};
+});
 
-// Add more controller functions as needed (e.g., createStop, updateStop, deleteStop)
-
-module.exports = {
-  getAllStops,
-  // export other functions
-};
+module.exports = router;

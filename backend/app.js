@@ -3,8 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const errorHandler = require('./utils/errorHandler');
 const connectDB = require('./config/db');
-const redisClient = require('./config/redis');
-const routeController = require('./controllers/routeController');
+require('dotenv').config(); 
 
 const app = express();
 
@@ -15,10 +14,14 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api/routes', routeController);
+// Mount API routes
+app.use('/api/allroutes', require('./controllers/routeController'));
+app.use('/api/allstops', require('./controllers/stopController'));
 
 // Error Handling Middleware
 app.use(errorHandler);
+
+// Scheduled jobs
+require('./jobs/updateRoutesAndStops');
 
 module.exports = app;

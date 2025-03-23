@@ -1,15 +1,10 @@
-// backend/services/ptvService.js
 const fetch = require('node-fetch');
 const buildPtvUrl = require('./ptvSignature');
 
-/**
- * Generic helper to fetch JSON from PTV endpoints.
- * @param {string} endpoint - e.g. '/v3/routes?route_types=0'
- * @returns {Promise<Object>} JSON response from PTV
- */
 async function fetchFromPTV(endpoint) {
   try {
     const url = buildPtvUrl(endpoint);
+    console.log('Fetching from PTV URL:', url);
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`PTV fetch failed: ${response.status} ${response.statusText}`);
@@ -21,6 +16,4 @@ async function fetchFromPTV(endpoint) {
   }
 }
 
-module.exports = {
-  fetchFromPTV,
-};
+module.exports = { fetchFromPTV };

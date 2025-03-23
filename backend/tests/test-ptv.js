@@ -1,6 +1,6 @@
 // test-ptv.js
-require('dotenv').config(); // Loads .env variables into process.env
-const { fetchFromPTV } = require('./backend/services/ptvService');
+require('dotenv').config({path: '../.env'}); // Loads .env variables into process.env
+const { fetchFromPTV } = require('../services/ptvService');
 
 async function testPTV() {
   try {

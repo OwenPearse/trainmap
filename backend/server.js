@@ -5,9 +5,9 @@ const app = require('./app');
 const redisClient = require('./config/redis');
 const logger = require('./utils/logger');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 
-// Create HTTP server
+// Create HTTP server from the Express app
 const server = http.createServer(app);
 
 // Initialize Socket.io
@@ -21,24 +21,19 @@ const io = socketIo(server, {
 // Handle Socket.io connections
 io.on('connection', (socket) => {
   logger.info(`New client connected: ${socket.id}`);
-
   socket.on('disconnect', () => {
     logger.info(`Client disconnected: ${socket.id}`);
   });
 });
 
-// Example: Emit real-time updates (e.g., vehicle locations)
+// (Optional) Emit real-time data periodically
 const emitRealTimeData = () => {
-  // Fetch data from Redis or directly from the database
-  // Example:
-  // const vehicleLocations = getVehicleLocations(); // Implement this function
+  // Fetch data from Redis or your database and emit updates
   // io.emit('vehicle-update', vehicleLocations);
 };
-
-// Set interval to emit real-time data every X seconds
 setInterval(emitRealTimeData, 30000); // Every 30 seconds
 
-// Start Server
+// Start the server
 server.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`);
 });
